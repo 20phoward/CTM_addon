@@ -7,7 +7,6 @@ import Dashboard from './components/Dashboard'
 import CallList from './components/CallList'
 import CallDetail from './components/CallDetail'
 import AudioUpload from './components/AudioUpload'
-import CallDialer from './components/CallDialer'
 import UserManagement from './components/UserManagement'
 import TeamManagement from './components/TeamManagement'
 import AuditLog from './components/AuditLog'
@@ -27,19 +26,18 @@ function Navbar() {
   const roleColors = {
     admin: 'bg-purple-200 text-purple-800',
     supervisor: 'bg-blue-200 text-blue-800',
-    worker: 'bg-green-200 text-green-800',
+    rep: 'bg-green-200 text-green-800',
   }
 
   return (
     <nav className="bg-indigo-700 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="text-xl font-bold tracking-tight">Call Monitor</Link>
+          <Link to="/" className="text-xl font-bold tracking-tight">CTM Scorer</Link>
           <div className="flex gap-6 text-sm font-medium">
             <Link to="/" className="hover:text-indigo-200">Dashboard</Link>
             <Link to="/calls" className="hover:text-indigo-200">Calls</Link>
             <Link to="/upload" className="hover:text-indigo-200">Upload</Link>
-            <Link to="/call" className="hover:text-indigo-200">Call</Link>
             <Link to="/reports" className="hover:text-indigo-200">Reports</Link>
             {user.role === 'admin' && (
               <>
@@ -77,7 +75,6 @@ export default function App() {
           <Route path="/calls" element={<ProtectedRoute><CallList /></ProtectedRoute>} />
           <Route path="/calls/:id" element={<ProtectedRoute><CallDetail /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><AudioUpload /></ProtectedRoute>} />
-          <Route path="/call" element={<ProtectedRoute><CallDialer /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
           <Route path="/users" element={<ProtectedRoute roles={['admin']}><UserManagement /></ProtectedRoute>} />
           <Route path="/teams" element={<ProtectedRoute roles={['admin']}><TeamManagement /></ProtectedRoute>} />
