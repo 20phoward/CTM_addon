@@ -1,0 +1,48 @@
+databases:
+  - name: ctm-scorer-db
+    plan: free
+    databaseName: ctm_scorer
+    user: ctm_scorer
+
+services:
+  - type: web
+    name: ctm-scorer-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ctm-scorer-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CTM_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_ADS_DRY_RUN
+        value: "true"
+      - key: WHISPER_MODEL
+        value: base
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: CORS_ORIGINS
+        value: "https://ctm-scorer-frontend.onrender.com"
+
+  - type: web
+    name: ctm-scorer-frontend
+    runtime: static
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: "https://ctm-scorer-api.onrender.com/api"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
