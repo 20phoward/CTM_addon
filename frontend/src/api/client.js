@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api' })
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api'
+})
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
@@ -102,7 +104,8 @@ export async function fetchConversions(params = {}) {
 export const fetchAuditLog = (params) => api.get('/audit-log', { params })
 
 export function audioUrl(filename) {
-  return `/audio/${filename}`
+  const base = import.meta.env.VITE_API_URL?.replace('/api', '') || ''
+  return `${base}/audio/${filename}`
 }
 
 // Reports
