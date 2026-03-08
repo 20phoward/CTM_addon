@@ -1,6 +1,7 @@
 from unittest.mock import patch, MagicMock
 from pathlib import Path
 from database import Call, CallScore, Transcript
+from services.pipeline import process_call
 
 
 def test_pipeline_creates_score_and_transcript(db):
@@ -123,3 +124,73 @@ def test_pipeline_handles_scoring_failure(db):
     assert call.status == "completed"
     assert call.score is not None
     assert call.score.rep_score is None
+
+
+def test_pipeline_creates_conversion_when_gclid_present(tmp_path, db):
+    """Pipeline should create ConversionStatus after scoring if GCLID exists."""
+    from database import ConversionStatus
+
+    audio = tmp_path / "test.wav"
+    audio.write_bytes(b"fake-wav-data")
+
+    call = Call(
+        source_type="ctm_webhook",
+        audio_filename=str(audio),
+        status="pending",
+        gclid="test-gclid-pipeline",
+    )
+    db.add(call)
+    db.commit()
+
+    with patch("services.pipeline.STORAGE_DIR", tmp_path), \
+         patch("services.pipeline.convert_to_wav", return_value=audio), \
+         patch("services.pipeline.transcribe_audio", return_value={
+             "full_text": "Hello", "segments": [], "duration": 30.0
+         }), \
+         patch("services.pipeline.score_call", return_value={
+             "rep_score": 7.0, "lead_score": 8.5,
+             "rep_tone": 7.0, "rep_steering": 7.0, "rep_service": 7.0, "rep_reasoning": "Good",
+             "lead_service_match": 9.0, "lead_insurance": 8.0, "lead_intent": 9.0, "lead_reasoning": "Strong",
+         }), \
+         patch("services.pipeline.upload_conversion", return_value={
+             "status": "sent (dry_run)", "gclid": "test-gclid-pipeline",
+             "conversion_value": 8.5, "error": None,
+         }):
+        process_call(call.id, db)
+
+    conv = db.query(ConversionStatus).filter(ConversionStatus.call_id == call.id).first()
+    assert conv is not None
+    assert conv.gclid == "test-gclid-pipeline"
+    assert conv.lead_score == 8.5
+    assert "sent" in conv.status
+
+
+def test_pipeline_skips_conversion_when_no_gclid(tmp_path, db):
+    """Pipeline should not create ConversionStatus if no GCLID."""
+    from database import ConversionStatus
+
+    audio = tmp_path / "test.wav"
+    audio.write_bytes(b"fake-wav-data")
+
+    call = Call(
+        source_type="manual_upload",
+        audio_filename=str(audio),
+        status="pending",
+    )
+    db.add(call)
+    db.commit()
+
+    with patch("services.pipeline.STORAGE_DIR", tmp_path), \
+         patch("services.pipeline.convert_to_wav", return_value=audio), \
+         patch("services.pipeline.transcribe_audio", return_value={
+             "full_text": "Hello", "segments": [], "duration": 30.0
+         }), \
+         patch("services.pipeline.score_call", return_value={
+             "rep_score": 7.0, "lead_score": 8.5,
+             "rep_tone": 7.0, "rep_steering": 7.0, "rep_service": 7.0, "rep_reasoning": "Good",
+             "lead_service_match": 9.0, "lead_insurance": 8.0, "lead_intent": 9.0, "lead_reasoning": "Strong",
+         }):
+        process_call(call.id, db)
+
+    conv = db.query(ConversionStatus).filter(ConversionStatus.call_id == call.id).first()
+    assert conv is None

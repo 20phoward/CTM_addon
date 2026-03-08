@@ -1,13 +1,15 @@
 import logging
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from config import STORAGE_DIR
-from database import Call, Transcript, CallScore
+from database import Call, Transcript, CallScore, ConversionStatus
 from services.transcription import transcribe_audio
 from services.scoring import score_call
+from services.google_ads import upload_conversion
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,35 @@ def convert_to_wav(input_path: Path) -> Path:
         check=True,
     )
     return wav_path
+
+
+def send_conversion(call: Call, lead_score: float, db: Session):
+    """Upload conversion to Google Ads if GCLID present."""
+    if not call.gclid:
+        return
+
+    conv = ConversionStatus(
+        call_id=call.id,
+        gclid=call.gclid,
+        lead_score=lead_score,
+        status="pending",
+    )
+    db.add(conv)
+    db.commit()
+
+    result = upload_conversion(
+        gclid=call.gclid,
+        conversion_value=lead_score,
+        conversion_time=call.call_date or datetime.now(timezone.utc),
+    )
+
+    conv.status = result["status"]
+    conv.error_message = result["error"]
+    if "sent" in result["status"]:
+        conv.sent_at = datetime.now(timezone.utc)
+    db.commit()
+
+    logger.info("Conversion for call %d: %s", call.id, result["status"])
 
 
 def process_call(call_id: int, db: Session):
@@ -79,6 +110,12 @@ def process_call(call_id: int, db: Session):
 
         call.status = "completed"
         db.commit()
+
+        # Send conversion to Google Ads (if GCLID present and lead score exists)
+        lead_score = scores.get("lead_score") if scores else None
+        if call.gclid and lead_score is not None:
+            send_conversion(call, lead_score, db)
+
         logger.info("Call %d processing completed", call_id)
 
     except Exception as e:
