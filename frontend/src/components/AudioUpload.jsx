@@ -4,7 +4,6 @@ import { uploadAudio } from '../api/client'
 
 export default function AudioUpload() {
   const [file, setFile] = useState(null)
-  const [title, setTitle] = useState('')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
   const [dragOver, setDragOver] = useState(false)
@@ -15,18 +14,12 @@ export default function AudioUpload() {
     e.preventDefault()
     setDragOver(false)
     const f = e.dataTransfer.files[0]
-    if (f) {
-      setFile(f)
-      if (!title) setTitle(f.name.replace(/\.[^/.]+$/, ''))
-    }
+    if (f) setFile(f)
   }
 
   const handleFileChange = (e) => {
     const f = e.target.files[0]
-    if (f) {
-      setFile(f)
-      if (!title) setTitle(f.name.replace(/\.[^/.]+$/, ''))
-    }
+    if (f) setFile(f)
   }
 
   const handleSubmit = async (e) => {
@@ -35,7 +28,7 @@ export default function AudioUpload() {
     setError(null)
     setUploading(true)
     try {
-      const call = await uploadAudio(file, title)
+      const call = await uploadAudio(file)
       navigate(`/calls/${call.id}`)
     } catch (e) {
       setError(e.response?.data?.detail || e.message)
@@ -48,17 +41,6 @@ export default function AudioUpload() {
       <h1 className="text-2xl font-bold mb-6">Upload Audio</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Call Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="e.g. Customer Support Call #42"
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-          />
-        </div>
-
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
             dragOver ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:border-gray-400'
