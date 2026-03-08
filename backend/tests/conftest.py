@@ -1,9 +1,3 @@
-import sys
-from unittest.mock import MagicMock
-
-if "whisper" not in sys.modules:
-    sys.modules["whisper"] = MagicMock()
-
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine

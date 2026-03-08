@@ -1,26 +1,24 @@
 import logging
 from pathlib import Path
 
-import whisper
+from openai import OpenAI
 
-from config import WHISPER_MODEL
+from config import OPENAI_API_KEY
 
 logger = logging.getLogger(__name__)
 
-_model = None
+_client = None
 
 
-def _get_model():
-    global _model
-    if _model is None:
-        logger.info("Loading Whisper model: %s", WHISPER_MODEL)
-        _model = whisper.load_model(WHISPER_MODEL)
-        logger.info("Whisper model loaded")
-    return _model
+def _get_client():
+    global _client
+    if _client is None:
+        _client = OpenAI(api_key=OPENAI_API_KEY)
+    return _client
 
 
 def transcribe_audio(audio_path: Path) -> dict:
-    """Transcribe an audio file using Whisper.
+    """Transcribe an audio file using OpenAI Whisper API.
 
     Returns:
         dict with keys:
@@ -28,28 +26,30 @@ def transcribe_audio(audio_path: Path) -> dict:
             - segments: list of {start, end, text}
             - duration: float (total seconds)
     """
-    model = _get_model()
-    logger.info("Transcribing: %s", audio_path)
+    client = _get_client()
+    logger.info("Transcribing via OpenAI Whisper API: %s", audio_path)
 
-    result = model.transcribe(
-        str(audio_path),
-        verbose=False,
-        word_timestamps=False,
-    )
+    with open(audio_path, "rb") as f:
+        result = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=f,
+            response_format="verbose_json",
+            timestamp_granularities=["segment"],
+        )
 
     segments = []
-    for seg in result.get("segments", []):
+    for seg in getattr(result, "segments", []) or []:
         segments.append({
             "start": round(seg["start"], 2),
             "end": round(seg["end"], 2),
             "text": seg["text"].strip(),
-            "speaker": None,  # basic: no diarization yet
+            "speaker": None,
         })
 
-    duration = segments[-1]["end"] if segments else 0.0
+    duration = segments[-1]["end"] if segments else getattr(result, "duration", 0.0)
 
     return {
-        "full_text": result["text"].strip(),
+        "full_text": result.text.strip(),
         "segments": segments,
         "duration": duration,
     }
@@ -61,17 +61,7 @@ def merge_speaker_segments(
     worker_name: str,
     patient_name: str,
 ) -> list[dict]:
-    """Merge two lists of transcript segments with speaker labels, sorted by start time.
-
-    Args:
-        worker_segments: list of {start, end, text} dicts from worker channel.
-        patient_segments: list of {start, end, text} dicts from patient channel.
-        worker_name: display name for the worker.
-        patient_name: display name for the patient.
-
-    Returns:
-        list of {start, end, text, speaker} dicts sorted chronologically.
-    """
+    """Merge two lists of transcript segments with speaker labels, sorted by start time."""
     merged = []
     for seg in worker_segments:
         merged.append({

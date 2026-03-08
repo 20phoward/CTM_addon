@@ -13,7 +13,7 @@ DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'calls.db'}")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 ALLOWED_AUDIO_EXTENSIONS = {".wav", ".mp3", ".m4a", ".webm", ".ogg", ".flac"}
 MAX_UPLOAD_SIZE_MB = 500
