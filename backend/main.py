@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from database import init_db
 from config import STORAGE_DIR
-from routers import calls, upload, auth, users, teams, audit, reports
+from routers import calls, upload, ctm_webhook, auth, users, teams, audit, reports
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -24,6 +24,7 @@ app.mount("/audio", StaticFiles(directory=str(STORAGE_DIR)), name="audio")
 
 app.include_router(calls.router)
 app.include_router(upload.router)
+app.include_router(ctm_webhook.router)
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(teams.router)

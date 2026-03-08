@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from config import STORAGE_DIR
 from database import Call, Transcript, CallScore
 from services.transcription import transcribe_audio
+from services.scoring import score_call
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +61,20 @@ def process_call(call_id: int, db: Session):
         call.duration = tx_result["duration"]
         db.commit()
 
-        # Score (placeholder — real scoring added in Phase 2)
+        # Score with Claude AI
         logger.info("Scoring call %d", call_id)
-        call_score = CallScore(call_id=call_id)
+        call_metadata = {
+            "duration": call.duration,
+            "campaign_name": call.campaign_name,
+            "keyword": call.keyword,
+            "landing_page_url": call.landing_page_url,
+        }
+        scores = score_call(tx_result["full_text"], tx_result["segments"], call_metadata)
+
+        if scores:
+            call_score = CallScore(call_id=call_id, **scores)
+        else:
+            call_score = CallScore(call_id=call_id)
         db.add(call_score)
 
         call.status = "completed"
