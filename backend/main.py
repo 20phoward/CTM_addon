@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from database import init_db
 from config import STORAGE_DIR
-from routers import calls, upload, ctm_webhook, auth, users, teams, audit, reports
+from routers import calls, upload, ctm_webhook, auth, users, teams, audit, reports, conversions
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -30,6 +30,7 @@ app.include_router(users.router)
 app.include_router(teams.router)
 app.include_router(audit.router)
 app.include_router(reports.router)
+app.include_router(conversions.router)
 
 
 @app.on_event("startup")
