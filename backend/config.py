@@ -9,6 +9,9 @@ STORAGE_DIR = Path(os.getenv("UPLOAD_DIR", str(BASE_DIR / "storage" / "audio")))
 STORAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'calls.db'}")
+# Render uses postgres:// but SQLAlchemy requires postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
 
