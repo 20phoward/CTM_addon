@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { fetchCallDetail, fetchCallStatus, deleteCall, audioUrl } from '../api/client'
+import { fetchCallDetail, fetchCallStatus, deleteCall, audioUrl, sendConversion } from '../api/client'
 import ScoreDisplay from './ScoreDisplay'
+import { useAuth } from '../contexts/AuthContext'
 
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60)
@@ -22,9 +23,20 @@ function MetaItem({ label, value }) {
 export default function CallDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const handleRetryConversion = async () => {
+    try {
+      await sendConversion(id)
+      const updated = await fetchCallDetail(id)
+      setCall(updated)
+    } catch (e) {
+      alert(e.response?.data?.detail || 'Failed to send conversion')
+    }
+  }
 
   useEffect(() => {
     let interval
@@ -120,14 +132,26 @@ export default function CallDetail() {
           <MetaItem label="CTM Call ID" value={call.ctm_call_id} />
         </div>
         {call.conversion && (
-          <div className="mt-3 pt-3 border-t">
+          <div className="mt-3 pt-3 border-t flex items-center gap-3">
             <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-              call.conversion.status === 'sent' ? 'bg-green-100 text-green-800' :
+              call.conversion.status.includes('sent') ? 'bg-green-100 text-green-800' :
               call.conversion.status === 'failed' ? 'bg-red-100 text-red-800' :
               'bg-gray-100 text-gray-800'
             }`}>
               Conversion: {call.conversion.status}
             </span>
+            {call.conversion.status === 'failed' && user?.role === 'admin' && (
+              <button onClick={handleRetryConversion} className="text-xs text-indigo-600 hover:underline">
+                Retry
+              </button>
+            )}
+          </div>
+        )}
+        {!call.conversion && call.gclid && call.status === 'completed' && user?.role === 'admin' && (
+          <div className="mt-3 pt-3 border-t">
+            <button onClick={handleRetryConversion} className="text-xs text-indigo-600 hover:underline">
+              Send Conversion
+            </button>
           </div>
         )}
       </div>

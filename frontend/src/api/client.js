@@ -87,6 +87,17 @@ export async function assignCall(id, repId) {
   return data
 }
 
+// Conversions
+export async function sendConversion(callId) {
+  const { data } = await api.post(`/conversions/send/${callId}`)
+  return data
+}
+
+export async function fetchConversions(params = {}) {
+  const { data } = await api.get('/conversions/status', { params })
+  return data
+}
+
 // Audit log
 export const fetchAuditLog = (params) => api.get('/audit-log', { params })
 

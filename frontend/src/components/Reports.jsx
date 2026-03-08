@@ -33,7 +33,7 @@ export default function Reports() {
     try {
       const params = { start_date: startDate, end_date: endDate }
       const trendsData = await fetchTrends({ ...params, period })
-      setTrends(trendsData)
+      setTrends(trendsData.buckets || trendsData)
 
       const campaignData = await fetchCampaigns(params)
       setCampaigns(campaignData)
