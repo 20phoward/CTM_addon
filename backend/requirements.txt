@@ -12,3 +12,5 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 reportlab
+# Google Ads (only needed when GOOGLE_ADS_DRY_RUN=false)
+# google-ads>=24.0.0
