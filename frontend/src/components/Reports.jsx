@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { fetchTrends, fetchTeamComparison, fetchCompliance, exportCsvUrl, exportPdfUrl } from '../api/client'
+import { fetchTrends, fetchCampaigns, fetchReps, exportCsvUrl, exportPdfUrl } from '../api/client'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   Legend, ResponsiveContainer,
@@ -22,8 +22,8 @@ export default function Reports() {
   const [endDate, setEndDate] = useState(() => formatDate(new Date()))
   const [period, setPeriod] = useState('weekly')
   const [trends, setTrends] = useState(null)
-  const [teamData, setTeamData] = useState(null)
-  const [compliance, setCompliance] = useState(null)
+  const [campaigns, setCampaigns] = useState(null)
+  const [reps, setReps] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -35,13 +35,13 @@ export default function Reports() {
       const trendsData = await fetchTrends({ ...params, period })
       setTrends(trendsData)
 
-      if (user.role !== 'worker') {
-        const teamComp = await fetchTeamComparison(params)
-        setTeamData(teamComp)
-      }
+      const campaignData = await fetchCampaigns(params)
+      setCampaigns(campaignData)
 
-      const comp = await fetchCompliance(params)
-      setCompliance(comp)
+      if (user.role !== 'rep') {
+        const repData = await fetchReps(params)
+        setReps(repData)
+      }
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load reports')
     } finally {
@@ -57,16 +57,15 @@ export default function Reports() {
   }
 
   const handleExport = (format) => {
-    const params = { report_type: 'calls', start_date: startDate, end_date: endDate }
+    const params = { start_date: startDate, end_date: endDate }
     const token = localStorage.getItem('access_token')
     const url = format === 'csv' ? exportCsvUrl(params) : exportPdfUrl(params)
-    // Use fetch with auth header to download
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
       .then(resp => resp.blob())
       .then(blob => {
         const a = document.createElement('a')
         a.href = URL.createObjectURL(blob)
-        a.download = `report-calls-${endDate}.${format}`
+        a.download = `report-${endDate}.${format}`
         a.click()
         URL.revokeObjectURL(a.href)
       })
@@ -121,176 +120,77 @@ export default function Reports() {
         </button>
       </div>
 
-      {/* Trends Chart */}
-      {trends && trends.buckets.some(b => b.call_count > 0) && (
+      {/* Score Trends */}
+      {trends && trends.length > 0 && trends.some(b => b.call_count > 0) && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Performance Trends</h2>
+          <h2 className="text-lg font-semibold mb-4">Score Trends</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={trends.buckets.filter(b => b.call_count > 0)}>
+            <LineChart data={trends.filter(b => b.call_count > 0)}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="start_date" tick={{ fontSize: 11 }}
                 tickFormatter={v => v.slice(5)} />
-              <YAxis yAxisId="rating" domain={[0, 10]} />
-              <YAxis yAxisId="sentiment" orientation="right" domain={[-1, 1]} />
+              <YAxis domain={[0, 10]} />
               <Tooltip />
               <Legend />
-              <Line yAxisId="rating" type="monotone" dataKey="avg_rating"
-                stroke="#6366f1" strokeWidth={2} name="Avg Rating" dot />
-              <Line yAxisId="sentiment" type="monotone" dataKey="avg_sentiment"
-                stroke="#10b981" strokeWidth={2} name="Avg Sentiment" dot />
+              <Line type="monotone" dataKey="avg_rep_score"
+                stroke="#6366f1" strokeWidth={2} name="Avg Rep Score" dot />
+              <Line type="monotone" dataKey="avg_lead_score"
+                stroke="#10b981" strokeWidth={2} name="Avg Lead Score" dot />
             </LineChart>
           </ResponsiveContainer>
         </div>
       )}
 
-      {/* Team/Worker Comparison Charts */}
-      {teamData && user.role === 'admin' && teamData.teams.length > 0 && (
-        <>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Avg Rating by Team</h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={teamData.teams}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="team_name" />
-                <YAxis domain={[0, 10]} />
-                <Tooltip />
-                <Bar dataKey="avg_rating" fill="#6366f1" name="Avg Rating" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Call Volume by Team</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={teamData.teams}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="team_name" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="call_count" fill="#a5b4fc" name="Call Count" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Flagged Calls by Team</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={teamData.teams}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="team_name" />
-                  <YAxis domain={[0, 100]} unit="%" />
-                  <Tooltip />
-                  <Bar dataKey="flagged_pct" fill="#ef4444" name="Flagged %" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </>
-      )}
-      {teamData && user.role === 'supervisor' && teamData.workers && teamData.workers.length > 0 && (
-        <>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Avg Rating by Worker</h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={teamData.workers}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="worker_name" />
-                <YAxis domain={[0, 10]} />
-                <Tooltip />
-                <Bar dataKey="avg_rating" fill="#6366f1" name="Avg Rating" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Call Volume by Worker</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={teamData.workers}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="worker_name" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="call_count" fill="#a5b4fc" name="Call Count" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Flagged Calls by Worker</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={teamData.workers}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="worker_name" />
-                  <YAxis domain={[0, 100]} unit="%" />
-                  <Tooltip />
-                  <Bar dataKey="flagged_pct" fill="#ef4444" name="Flagged %" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Compliance Summary */}
-      {compliance && (
+      {/* Campaign Performance */}
+      {campaigns && campaigns.length > 0 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Compliance</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-indigo-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-indigo-700">
-                {compliance.score_compliance.passing_pct}%
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Score Compliance</div>
-              <div className="text-xs text-gray-400">
-                {compliance.score_compliance.passing_calls}/{compliance.score_compliance.total_calls} calls
-              </div>
-            </div>
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-green-700">
-                {compliance.review_completion.review_pct}%
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Review Completion</div>
-              <div className="text-xs text-gray-400">
-                {compliance.review_completion.reviewed_count}/{compliance.review_completion.total_completed_calls} calls
-              </div>
-            </div>
-            <div className="bg-yellow-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-700">
-                {compliance.review_completion.avg_days_to_review ?? '—'}
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Avg Days to Review</div>
-            </div>
-            <div className="bg-red-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-red-700">
-                {compliance.review_completion.unreviewed_backlog}
-              </div>
-              <div className="text-xs text-gray-600 mt-1">Unreviewed Backlog</div>
-            </div>
-          </div>
+          <h2 className="text-lg font-semibold mb-4">Campaign Performance</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={campaigns}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="campaign_name" tick={{ fontSize: 11 }} />
+              <YAxis yAxisId="score" domain={[0, 10]} />
+              <YAxis yAxisId="count" orientation="right" allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Bar yAxisId="score" dataKey="avg_lead_score" fill="#10b981" name="Avg Lead Score" />
+              <Bar yAxisId="score" dataKey="avg_rep_score" fill="#6366f1" name="Avg Rep Score" />
+              <Bar yAxisId="count" dataKey="call_count" fill="#cbd5e1" name="Call Count" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
-          {compliance.score_compliance.failing_workers.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Workers Below Threshold ({compliance.score_compliance.threshold})
-              </h3>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500 border-b">
-                    <th className="py-2">Worker</th>
-                    <th className="py-2">Avg Score</th>
-                    <th className="py-2">Calls Below</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {compliance.score_compliance.failing_workers.map(w => (
-                    <tr key={w.worker_id} className="border-b">
-                      <td className="py-2">{w.name}</td>
-                      <td className="py-2 text-red-600">{w.avg_score}</td>
-                      <td className="py-2">{w.calls_below}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+      {/* Rep Performance (supervisor/admin only) */}
+      {reps && reps.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold mb-4">Rep Performance</h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-500 border-b">
+                <th className="py-2">Rep</th>
+                <th className="py-2">Calls</th>
+                <th className="py-2">Avg Rep Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {reps.map(r => (
+                <tr key={r.rep_id} className="border-b">
+                  <td className="py-2">{r.rep_name}</td>
+                  <td className="py-2">{r.call_count}</td>
+                  <td className="py-2">
+                    {r.avg_rep_score != null ? (
+                      <span className={`font-medium ${
+                        r.avg_rep_score >= 8 ? 'text-green-600' :
+                        r.avg_rep_score >= 6 ? 'text-yellow-600' :
+                        r.avg_rep_score >= 4 ? 'text-orange-600' : 'text-red-600'
+                      }`}>{r.avg_rep_score.toFixed(1)}</span>
+                    ) : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
