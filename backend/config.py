@@ -34,3 +34,6 @@ GOOGLE_ADS_REFRESH_TOKEN = os.getenv("GOOGLE_ADS_REFRESH_TOKEN", "")
 GOOGLE_ADS_CUSTOMER_ID = os.getenv("GOOGLE_ADS_CUSTOMER_ID", "")
 GOOGLE_ADS_DRY_RUN = os.getenv("GOOGLE_ADS_DRY_RUN", "true").lower() in ("true", "1", "yes")
 GOOGLE_ADS_CONVERSION_ACTION = os.getenv("GOOGLE_ADS_CONVERSION_ACTION", "")
+
+# CORS — comma-separated origins, or "*" for dev
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:5175,http://localhost:3000,http://127.0.0.1:5175")

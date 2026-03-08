@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from database import init_db
-from config import STORAGE_DIR
+from config import STORAGE_DIR, CORS_ORIGINS
 from routers import calls, upload, ctm_webhook, auth, users, teams, audit, reports, conversions
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -14,7 +14,7 @@ app = FastAPI(title="CTM Scorer", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5175", "http://localhost:3000", "http://127.0.0.1:5175"],
+    allow_origins=[o.strip() for o in CORS_ORIGINS.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
