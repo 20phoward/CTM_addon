@@ -35,7 +35,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-6 text-indigo-700">Call Monitor</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-indigo-700">CTM Scorer</h1>
         <h2 className="text-lg font-semibold mb-4">{isRegister ? 'Create Account' : 'Sign In'}</h2>
 
         {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}

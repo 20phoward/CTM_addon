@@ -4,7 +4,7 @@ import { fetchTeams, createTeam, fetchUsers, updateUser } from '../api/client'
 const roleColor = {
   admin: 'text-purple-600 bg-purple-50',
   supervisor: 'text-blue-600 bg-blue-50',
-  worker: 'text-green-600 bg-green-50',
+  rep: 'text-green-600 bg-green-50',
 }
 
 export default function TeamManagement() {

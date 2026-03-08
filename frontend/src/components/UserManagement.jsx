@@ -7,7 +7,7 @@ export default function UserManagement() {
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [formData, setFormData] = useState({ email: '', password: '', name: '', role: 'worker', team_id: '' })
+  const [formData, setFormData] = useState({ email: '', password: '', name: '', role: 'rep', team_id: '' })
   const [error, setError] = useState('')
   const { user: currentUser } = useAuth()
 
@@ -30,7 +30,7 @@ export default function UserManagement() {
       if (data.team_id) data.team_id = parseInt(data.team_id)
       else delete data.team_id
       await register(data)
-      setFormData({ email: '', password: '', name: '', role: 'worker', team_id: '' })
+      setFormData({ email: '', password: '', name: '', role: 'rep', team_id: '' })
       setShowForm(false)
       loadData()
     } catch (err) {
@@ -69,7 +69,7 @@ export default function UserManagement() {
   const roleColor = {
     admin: 'text-purple-600 bg-purple-50',
     supervisor: 'text-blue-600 bg-blue-50',
-    worker: 'text-green-600 bg-green-50',
+    rep: 'text-green-600 bg-green-50',
   }
 
   const teamName = (teamId) => {
@@ -98,7 +98,7 @@ export default function UserManagement() {
             <p className="text-xs text-gray-500">Min 8 chars, uppercase, lowercase, and number</p>
             <div className="flex space-x-4">
               <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="border border-gray-300 rounded-md px-3 py-2">
-                <option value="worker">Worker</option>
+                <option value="rep">Rep</option>
                 <option value="supervisor">Supervisor</option>
                 <option value="admin">Admin</option>
               </select>
@@ -135,9 +135,9 @@ export default function UserManagement() {
                     </span>
                   ) : (
                     <select value={u.role} onChange={(e) => handleRoleChange(u.id, e.target.value)} className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${roleColor[u.role]}`}>
-                      <option value="admin">admin</option>
-                      <option value="supervisor">supervisor</option>
-                      <option value="worker">worker</option>
+                      <option value="admin">Admin</option>
+                      <option value="supervisor">Supervisor</option>
+                      <option value="rep">Rep</option>
                     </select>
                   )}
                 </td>
