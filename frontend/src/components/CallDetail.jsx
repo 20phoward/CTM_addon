@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { fetchCallDetail, fetchCallStatus, deleteCall, audioUrl } from '../api/client'
-import TonalityChart from './TonalityChart'
-import ScoreCard from './ScoreCard'
-import ReviewPanel from './ReviewPanel'
-import { useAuth } from '../contexts/AuthContext'
+import ScoreDisplay from './ScoreDisplay'
 
 function formatTime(seconds) {
   const m = Math.floor(seconds / 60)
   const s = Math.round(seconds % 60)
   return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+function MetaItem({ label, value }) {
+  if (!value) return null
+  return (
+    <div>
+      <span className="text-xs text-gray-500">{label}</span>
+      <p className="text-sm font-medium text-gray-800">{value}</p>
+    </div>
+  )
 }
 
 export default function CallDetail() {
@@ -18,7 +25,6 @@ export default function CallDetail() {
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const { user } = useAuth()
 
   useEffect(() => {
     let interval
@@ -27,8 +33,7 @@ export default function CallDetail() {
         const data = await fetchCallDetail(id)
         setCall(data)
         setLoading(false)
-        // Poll while processing
-        if (['pending', 'processing', 'connecting', 'in_progress'].includes(data.status)) {
+        if (['pending', 'processing'].includes(data.status)) {
           interval = setInterval(async () => {
             const status = await fetchCallStatus(id)
             if (status.status !== data.status) {
@@ -61,8 +66,6 @@ export default function CallDetail() {
 
   const statusColors = {
     pending: 'text-yellow-600',
-    connecting: 'text-orange-600',
-    in_progress: 'text-blue-600',
     processing: 'text-blue-600',
     completed: 'text-green-600',
     failed: 'text-red-600',
@@ -70,26 +73,16 @@ export default function CallDetail() {
 
   return (
     <div>
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{call.title}</h1>
+          <h1 className="text-2xl font-bold">
+            Call {call.call_date ? new Date(call.call_date).toLocaleDateString() : `#${call.id}`}
+          </h1>
           <p className="text-sm text-gray-500">
-            {new Date(call.date).toLocaleString()} &middot;{' '}
             <span className={statusColors[call.status]}>{call.status}</span>
-            {call.duration && ` \u00b7 ${formatTime(call.duration)}`}
-            {call.source_type === 'twilio' && (
-              <>
-                {' · '}
-                <span className="bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded text-xs">
-                  {call.call_direction || 'call'}
-                </span>
-                {call.connection_mode && (
-                  <span className="bg-gray-100 text-gray-700 px-1.5 py-0.5 rounded text-xs ml-1">
-                    {call.connection_mode}
-                  </span>
-                )}
-              </>
-            )}
+            {call.duration && ` · ${formatTime(call.duration)}`}
+            {call.source_type && ` · ${call.source_type}`}
           </p>
         </div>
         <button onClick={handleDelete} className="text-red-500 hover:text-red-700 text-sm border border-red-300 px-3 py-1 rounded">
@@ -103,7 +96,7 @@ export default function CallDetail() {
         </div>
       )}
 
-      {['pending', 'processing', 'connecting', 'in_progress'].includes(call.status) && (
+      {['pending', 'processing'].includes(call.status) && (
         <div className="bg-blue-50 border border-blue-200 text-blue-700 p-4 rounded mb-6 flex items-center gap-3">
           <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -113,6 +106,32 @@ export default function CallDetail() {
         </div>
       )}
 
+      {/* Call Metadata */}
+      <div className="bg-white rounded-lg shadow p-5 mb-6">
+        <h2 className="text-base font-semibold text-gray-700 mb-3">Call Details</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <MetaItem label="Caller" value={call.caller_phone} />
+          <MetaItem label="Receiving Number" value={call.receiving_number} />
+          <MetaItem label="Campaign" value={call.campaign_name} />
+          <MetaItem label="Keyword" value={call.keyword} />
+          <MetaItem label="Landing Page" value={call.landing_page_url} />
+          <MetaItem label="GCLID" value={call.gclid} />
+          <MetaItem label="Rep" value={call.rep_name} />
+          <MetaItem label="CTM Call ID" value={call.ctm_call_id} />
+        </div>
+        {call.conversion && (
+          <div className="mt-3 pt-3 border-t">
+            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+              call.conversion.status === 'sent' ? 'bg-green-100 text-green-800' :
+              call.conversion.status === 'failed' ? 'bg-red-100 text-red-800' :
+              'bg-gray-100 text-gray-800'
+            }`}>
+              Conversion: {call.conversion.status}
+            </span>
+          </div>
+        )}
+      </div>
+
       {/* Audio Player */}
       {call.audio_filename && (
         <div className="mb-6">
@@ -121,76 +140,11 @@ export default function CallDetail() {
         </div>
       )}
 
-      {/* Tonality Summary */}
-      {call.tonality && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3">Tonality Analysis</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-500 mb-1">Overall Sentiment</p>
-              <p className="text-xl font-bold capitalize">{call.tonality.overall_sentiment}</p>
-              <p className="text-sm text-gray-500">
-                Score: {call.tonality.overall_score?.toFixed(2)}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-500 mb-1">Tone</p>
-              <div className="flex flex-wrap gap-2">
-                {(call.tonality.tone_labels || []).map(t => (
-                  <span key={t} className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-xs capitalize">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {call.tonality.summary && (
-            <div className="bg-white rounded-lg shadow p-4 mb-4">
-              <p className="text-sm text-gray-500 mb-1">Summary</p>
-              <p className="text-sm">{call.tonality.summary}</p>
-            </div>
-          )}
-
-          {/* Sentiment timeline chart */}
-          {call.tonality.sentiment_scores?.length > 0 && (
-            <TonalityChart data={call.tonality.sentiment_scores} keyMoments={call.tonality.key_moments} />
-          )}
-
-          {/* Key moments */}
-          {call.tonality.key_moments?.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-4 mt-4">
-              <p className="text-sm text-gray-500 mb-2">Key Moments</p>
-              <ul className="space-y-2">
-                {call.tonality.key_moments.map((m, i) => (
-                  <li key={i} className="flex gap-3 text-sm">
-                    <span className="font-mono text-gray-400 whitespace-nowrap">{formatTime(m.time)}</span>
-                    <span className="bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded text-xs">{m.emotion}</span>
-                    <span>{m.description}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Quality Score */}
+      {/* Scores */}
       {call.score && (
         <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3">Quality Score</h2>
-          <div className={`grid grid-cols-1 ${user?.role !== 'worker' ? 'md:grid-cols-2' : ''} gap-4`}>
-            <ScoreCard score={call.score} review={call.review} />
-            {user?.role !== 'worker' && (
-              <ReviewPanel
-                callId={call.id}
-                score={call.score}
-                review={call.review}
-                onReviewSubmitted={() => fetchCallDetail(id).then(setCall)}
-              />
-            )}
-          </div>
+          <h2 className="text-lg font-semibold mb-3">Scores</h2>
+          <ScoreDisplay score={call.score} />
         </div>
       )}
 
