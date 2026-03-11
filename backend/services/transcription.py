@@ -39,10 +39,13 @@ def transcribe_audio(audio_path: Path) -> dict:
 
     segments = []
     for seg in getattr(result, "segments", []) or []:
+        start = seg.start if hasattr(seg, "start") else seg["start"]
+        end = seg.end if hasattr(seg, "end") else seg["end"]
+        text = seg.text if hasattr(seg, "text") else seg["text"]
         segments.append({
-            "start": round(seg["start"], 2),
-            "end": round(seg["end"], 2),
-            "text": seg["text"].strip(),
+            "start": round(start, 2),
+            "end": round(end, 2),
+            "text": text.strip(),
             "speaker": None,
         })
 
