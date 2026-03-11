@@ -33,9 +33,9 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-6 text-indigo-700">CTM Scorer</h1>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="bg-white p-8 rounded-lg border border-slate-200 w-full max-w-sm">
+        <h1 className="text-2xl font-bold text-center mb-6 text-slate-800">CTM Scorer</h1>
         <h2 className="text-lg font-semibold mb-4">{isRegister ? 'Create Account' : 'Sign In'}</h2>
 
         {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
@@ -45,30 +45,30 @@ export default function Login() {
             <input
               type="text" placeholder="Full Name" required
               value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
             />
           )}
           <input
             type="email" placeholder="Email" required
             value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
           />
           <input
             type="password" placeholder="Password" required
             value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
           />
           {isRegister && (
-            <p className="text-xs text-gray-500">Min 8 chars, uppercase, lowercase, and number required</p>
+            <p className="text-xs text-slate-400">Min 8 chars, uppercase, lowercase, and number required</p>
           )}
-          <button type="submit" className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 font-medium">
+          <button type="submit" className="w-full bg-slate-700 text-white py-2 rounded-md hover:bg-slate-800 font-medium">
             {isRegister ? 'Register' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-slate-500 mt-4">
           {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-          <button onClick={() => { setIsRegister(!isRegister); setError(''); }} className="text-indigo-600 hover:underline">
+          <button onClick={() => { setIsRegister(!isRegister); setError(''); }} className="text-slate-600 hover:text-slate-800 hover:underline">
             {isRegister ? 'Sign In' : 'Register'}
           </button>
         </p>

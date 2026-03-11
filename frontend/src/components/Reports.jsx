@@ -72,7 +72,7 @@ export default function Reports() {
   }
 
   if (loading) {
-    return <div className="text-center py-12 text-gray-500">Loading reports...</div>
+    return <div className="text-center py-12 text-slate-500">Loading reports...</div>
   }
 
   return (
@@ -81,20 +81,20 @@ export default function Reports() {
         <h1 className="text-2xl font-bold">Reports & Analytics</h1>
         <div className="flex gap-2">
           <button onClick={() => handleExport('csv')}
-            className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Export CSV</button>
+            className="px-3 py-1.5 text-sm border rounded-lg hover:bg-slate-50">Export CSV</button>
           <button onClick={() => handleExport('pdf')}
-            className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">Export PDF</button>
+            className="px-3 py-1.5 text-sm border rounded-lg hover:bg-slate-50">Export PDF</button>
         </div>
       </div>
 
       {error && <div className="bg-red-50 text-red-600 p-3 rounded text-sm">{error}</div>}
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 flex flex-wrap items-center gap-4">
+      <div className="bg-white rounded-lg border border-slate-200 p-4 flex flex-wrap items-center gap-4">
         <div className="flex gap-1">
           {PRESETS.map(p => (
             <button key={p.days} onClick={() => applyPreset(p.days)}
-              className="px-3 py-1 text-xs border rounded-full hover:bg-indigo-50 hover:border-indigo-300">
+              className="px-3 py-1 text-xs border rounded-full hover:bg-slate-50 hover:border-slate-400">
               {p.label}
             </button>
           ))}
@@ -102,12 +102,12 @@ export default function Reports() {
         <div className="flex items-center gap-2 text-sm">
           <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
             className="border rounded px-2 py-1" />
-          <span className="text-gray-400">to</span>
+          <span className="text-slate-400">to</span>
           <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
             className="border rounded px-2 py-1" />
         </div>
         <div className="flex items-center gap-2 text-sm">
-          <label className="text-gray-600">Period:</label>
+          <label className="text-slate-600">Period:</label>
           <select value={period} onChange={e => setPeriod(e.target.value)}
             className="border rounded px-2 py-1">
             <option value="weekly">Weekly</option>
@@ -115,14 +115,14 @@ export default function Reports() {
           </select>
         </div>
         <button onClick={loadData}
-          className="px-4 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
+          className="px-4 py-1.5 bg-slate-700 text-white text-sm rounded-lg hover:bg-slate-800">
           Apply
         </button>
       </div>
 
       {/* Score Trends */}
       {trends && trends.length > 0 && trends.some(b => b.call_count > 0) && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
           <h2 className="text-lg font-semibold mb-4">Score Trends</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trends.filter(b => b.call_count > 0)}>
@@ -133,7 +133,7 @@ export default function Reports() {
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="avg_rep_score"
-                stroke="#6366f1" strokeWidth={2} name="Avg Rep Score" dot />
+                stroke="#475569" strokeWidth={2} name="Avg Rep Score" dot />
               <Line type="monotone" dataKey="avg_lead_score"
                 stroke="#10b981" strokeWidth={2} name="Avg Lead Score" dot />
             </LineChart>
@@ -143,7 +143,7 @@ export default function Reports() {
 
       {/* Campaign Performance */}
       {campaigns && campaigns.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
           <h2 className="text-lg font-semibold mb-4">Campaign Performance</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={campaigns}>
@@ -154,7 +154,7 @@ export default function Reports() {
               <Tooltip />
               <Legend />
               <Bar yAxisId="score" dataKey="avg_lead_score" fill="#10b981" name="Avg Lead Score" />
-              <Bar yAxisId="score" dataKey="avg_rep_score" fill="#6366f1" name="Avg Rep Score" />
+              <Bar yAxisId="score" dataKey="avg_rep_score" fill="#475569" name="Avg Rep Score" />
               <Bar yAxisId="count" dataKey="call_count" fill="#cbd5e1" name="Call Count" />
             </BarChart>
           </ResponsiveContainer>
@@ -163,11 +163,11 @@ export default function Reports() {
 
       {/* Rep Performance (supervisor/admin only) */}
       {reps && reps.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg border border-slate-200 p-6">
           <h2 className="text-lg font-semibold mb-4">Rep Performance</h2>
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-500 border-b">
+              <tr className="text-left text-slate-500 border-b">
                 <th className="py-2">Rep</th>
                 <th className="py-2">Calls</th>
                 <th className="py-2">Avg Rep Score</th>

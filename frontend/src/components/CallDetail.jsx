@@ -14,8 +14,8 @@ function MetaItem({ label, value }) {
   if (!value) return null
   return (
     <div>
-      <span className="text-xs text-gray-500">{label}</span>
-      <p className="text-sm font-medium text-gray-800">{value}</p>
+      <span className="text-xs text-slate-500">{label}</span>
+      <p className="text-sm font-medium text-slate-800">{value}</p>
     </div>
   )
 }
@@ -72,7 +72,7 @@ export default function CallDetail() {
     navigate('/calls')
   }
 
-  if (loading) return <p className="text-gray-500">Loading...</p>
+  if (loading) return <p className="text-slate-500">Loading...</p>
   if (error) return <p className="text-red-600">Error: {error}</p>
   if (!call) return <p className="text-red-600">Call not found</p>
 
@@ -88,10 +88,10 @@ export default function CallDetail() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-slate-900">
             Call {call.call_date ? new Date(call.call_date).toLocaleDateString() : `#${call.id}`}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-500">
             <span className={statusColors[call.status]}>{call.status}</span>
             {call.duration && ` · ${formatTime(call.duration)}`}
             {call.source_type && ` · ${call.source_type}`}
@@ -119,8 +119,8 @@ export default function CallDetail() {
       )}
 
       {/* Call Metadata */}
-      <div className="bg-white rounded-lg shadow p-5 mb-6">
-        <h2 className="text-base font-semibold text-gray-700 mb-3">Call Details</h2>
+      <div className="bg-white rounded-lg border border-slate-200 p-5 mb-6">
+        <h2 className="text-base font-semibold text-slate-700 mb-3">Call Details</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           <MetaItem label="Caller" value={call.caller_phone} />
           <MetaItem label="Receiving Number" value={call.receiving_number} />
@@ -136,12 +136,12 @@ export default function CallDetail() {
             <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
               call.conversion.status.includes('sent') ? 'bg-green-100 text-green-800' :
               call.conversion.status === 'failed' ? 'bg-red-100 text-red-800' :
-              'bg-gray-100 text-gray-800'
+              'bg-slate-100 text-slate-800'
             }`}>
               Conversion: {call.conversion.status}
             </span>
             {call.conversion.status === 'failed' && user?.role === 'admin' && (
-              <button onClick={handleRetryConversion} className="text-xs text-indigo-600 hover:underline">
+              <button onClick={handleRetryConversion} className="text-xs text-slate-600 hover:underline">
                 Retry
               </button>
             )}
@@ -149,7 +149,7 @@ export default function CallDetail() {
         )}
         {!call.conversion && call.gclid && call.status === 'completed' && user?.role === 'admin' && (
           <div className="mt-3 pt-3 border-t">
-            <button onClick={handleRetryConversion} className="text-xs text-indigo-600 hover:underline">
+            <button onClick={handleRetryConversion} className="text-xs text-slate-600 hover:underline">
               Send Conversion
             </button>
           </div>
@@ -176,7 +176,7 @@ export default function CallDetail() {
       {call.transcript && (
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-3">Transcript</h2>
-          <div className="bg-white rounded-lg shadow p-4 max-h-96 overflow-y-auto space-y-3">
+          <div className="bg-white rounded-lg border border-slate-200 p-4 max-h-96 overflow-y-auto space-y-3">
             {call.transcript.segments?.length > 0 ? (
               call.transcript.segments.map((seg, i) => {
                 const prevSpeaker = i > 0 ? call.transcript.segments[i - 1].speaker : null
@@ -185,13 +185,13 @@ export default function CallDetail() {
                 const isFirstSpeaker = seg.speaker === firstSpeaker
                 return (
                   <div key={i} className="flex gap-3 text-sm">
-                    <span className="font-mono text-gray-400 whitespace-nowrap text-xs mt-0.5">
+                    <span className="font-mono text-slate-400 whitespace-nowrap text-xs mt-0.5">
                       {formatTime(seg.start)}
                     </span>
                     <div>
                       {showSpeaker && (
                         <span className={`text-xs font-semibold mr-1 ${
-                          isFirstSpeaker ? 'text-indigo-600' : 'text-emerald-600'
+                          isFirstSpeaker ? 'text-slate-600' : 'text-emerald-600'
                         }`}>
                           {seg.speaker}:
                         </span>

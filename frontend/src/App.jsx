@@ -24,26 +24,26 @@ function Navbar() {
   }
 
   const roleColors = {
-    admin: 'bg-purple-200 text-purple-800',
-    supervisor: 'bg-blue-200 text-blue-800',
-    rep: 'bg-green-200 text-green-800',
+    admin: 'bg-slate-200 text-slate-700',
+    supervisor: 'bg-slate-200 text-slate-600',
+    rep: 'bg-slate-100 text-slate-500',
   }
 
   return (
-    <nav className="bg-indigo-700 text-white shadow-lg">
+    <nav className="bg-slate-800 text-white">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <Link to="/" className="text-xl font-bold tracking-tight">CTM Scorer</Link>
           <div className="flex gap-6 text-sm font-medium">
-            <Link to="/" className="hover:text-indigo-200">Dashboard</Link>
-            <Link to="/calls" className="hover:text-indigo-200">Calls</Link>
-            <Link to="/upload" className="hover:text-indigo-200">Upload</Link>
-            <Link to="/reports" className="hover:text-indigo-200">Reports</Link>
+            <Link to="/" className="hover:text-slate-300">Dashboard</Link>
+            <Link to="/calls" className="hover:text-slate-300">Calls</Link>
+            <Link to="/upload" className="hover:text-slate-300">Upload</Link>
+            <Link to="/reports" className="hover:text-slate-300">Reports</Link>
             {user.role === 'admin' && (
               <>
-                <Link to="/users" className="hover:text-indigo-200">Users</Link>
-                <Link to="/teams" className="hover:text-indigo-200">Teams</Link>
-                <Link to="/audit-log" className="hover:text-indigo-200">Audit Log</Link>
+                <Link to="/users" className="hover:text-slate-300">Users</Link>
+                <Link to="/teams" className="hover:text-slate-300">Teams</Link>
+                <Link to="/audit-log" className="hover:text-slate-300">Audit Log</Link>
               </>
             )}
           </div>
@@ -53,7 +53,7 @@ function Navbar() {
           <span className={`px-2 py-0.5 rounded text-xs font-medium ${roleColors[user.role]}`}>
             {user.role}
           </span>
-          <button onClick={handleLogout} className="text-indigo-200 hover:text-white ml-2">
+          <button onClick={handleLogout} className="text-slate-400 hover:text-white ml-2">
             Logout
           </button>
         </div>
@@ -64,7 +64,7 @@ function Navbar() {
 
 export default function App() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
       <InactivityTimer />
 

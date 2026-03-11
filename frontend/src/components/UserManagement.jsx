@@ -67,9 +67,9 @@ export default function UserManagement() {
   }
 
   const roleColor = {
-    admin: 'text-purple-600 bg-purple-50',
-    supervisor: 'text-blue-600 bg-blue-50',
-    rep: 'text-green-600 bg-green-50',
+    admin: 'text-slate-700 bg-slate-100',
+    supervisor: 'text-slate-600 bg-slate-50',
+    rep: 'text-slate-500 bg-slate-50',
   }
 
   const teamName = (teamId) => {
@@ -83,51 +83,51 @@ export default function UserManagement() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">User Management</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition text-sm">
+        <button onClick={() => setShowForm(!showForm)} className="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition text-sm">
           {showForm ? 'Cancel' : 'New User'}
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 max-w-lg">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-6 max-w-lg">
           {error && <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
           <form onSubmit={handleCreate} className="space-y-4">
-            <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-            <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required />
-            <p className="text-xs text-gray-500">Min 8 chars, uppercase, lowercase, and number</p>
+            <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400" required />
+            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400" required />
+            <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400" required />
+            <p className="text-xs text-slate-500">Min 8 chars, uppercase, lowercase, and number</p>
             <div className="flex space-x-4">
-              <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="border border-gray-300 rounded-md px-3 py-2">
+              <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="border border-slate-300 rounded-md px-3 py-2">
                 <option value="rep">Rep</option>
                 <option value="supervisor">Supervisor</option>
                 <option value="admin">Admin</option>
               </select>
-              <select value={formData.team_id} onChange={(e) => setFormData({ ...formData, team_id: e.target.value })} className="border border-gray-300 rounded-md px-3 py-2">
+              <select value={formData.team_id} onChange={(e) => setFormData({ ...formData, team_id: e.target.value })} className="border border-slate-300 rounded-md px-3 py-2">
                 <option value="">No Team</option>
                 {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
-            <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm">Create User</button>
+            <button type="submit" className="bg-slate-700 text-white px-4 py-2 rounded-md hover:bg-slate-800 text-sm">Create User</button>
           </form>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-slate-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Name</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Role</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Team</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-slate-100">
             {users.map((u) => (
-              <tr key={u.id} className="hover:bg-gray-50">
+              <tr key={u.id} className="hover:bg-slate-50">
                 <td className="px-6 py-4 font-medium">{u.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{u.email}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{u.email}</td>
                 <td className="px-6 py-4">
                   {u.id === currentUser?.id ? (
                     <span className={`px-2 py-1 rounded text-xs font-medium ${roleColor[u.role]}`}>
@@ -143,9 +143,9 @@ export default function UserManagement() {
                 </td>
                 <td className="px-6 py-4">
                   {u.id === currentUser?.id ? (
-                    <span className="text-sm text-gray-500">{teamName(u.team_id) || '—'}</span>
+                    <span className="text-sm text-slate-500">{teamName(u.team_id) || '—'}</span>
                   ) : (
-                    <select value={u.team_id || ''} onChange={(e) => handleTeamChange(u.id, e.target.value ? parseInt(e.target.value) : null)} className="text-sm border border-gray-200 rounded px-2 py-1 cursor-pointer">
+                    <select value={u.team_id || ''} onChange={(e) => handleTeamChange(u.id, e.target.value ? parseInt(e.target.value) : null)} className="text-sm border border-slate-200 rounded px-2 py-1 cursor-pointer">
                       <option value="">No Team</option>
                       {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
                     </select>

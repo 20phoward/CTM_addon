@@ -43,7 +43,7 @@ export default function AudioUpload() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
-            dragOver ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 hover:border-gray-400'
+            dragOver ? 'border-slate-400 bg-slate-50' : 'border-slate-300 hover:border-slate-400'
           }`}
           onDragOver={e => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
@@ -60,12 +60,12 @@ export default function AudioUpload() {
           {file ? (
             <div>
               <p className="font-medium">{file.name}</p>
-              <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+              <p className="text-sm text-slate-500">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
             </div>
           ) : (
             <div>
-              <p className="text-gray-500">Drag & drop an audio file here, or click to browse</p>
-              <p className="text-xs text-gray-400 mt-1">WAV, MP3, M4A, WebM, OGG, FLAC</p>
+              <p className="text-slate-500">Drag & drop an audio file here, or click to browse</p>
+              <p className="text-xs text-slate-400 mt-1">WAV, MP3, M4A, WebM, OGG, FLAC</p>
             </div>
           )}
         </div>
@@ -77,7 +77,7 @@ export default function AudioUpload() {
         <button
           type="submit"
           disabled={!file || uploading}
-          className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-slate-700 text-white py-2 rounded-lg font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading ? 'Uploading...' : 'Upload & Process'}
         </button>

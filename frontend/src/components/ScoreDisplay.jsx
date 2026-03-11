@@ -14,7 +14,7 @@ function ScoreCircle({ score, label, color }) {
       <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full border-4 ${ringColor}`}>
         <span className={`text-xl font-bold ${textColor}`}>{score.toFixed(1)}</span>
       </div>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
+      <p className="text-xs text-slate-500 mt-1">{label}</p>
     </div>
   )
 }
@@ -29,11 +29,11 @@ function SubScore({ label, value }) {
 
   return (
     <div className="flex items-center gap-3 text-sm">
-      <span className="w-28 text-gray-600 shrink-0">{label}</span>
-      <div className="flex-1 bg-gray-100 rounded-full h-2">
+      <span className="w-28 text-slate-600 shrink-0">{label}</span>
+      <div className="flex-1 bg-slate-100 rounded-full h-2">
         <div className={`h-2 rounded-full ${color}`} style={{ width: barWidth }} />
       </div>
-      <span className="w-8 text-right text-gray-700 font-medium">{value.toFixed(1)}</span>
+      <span className="w-8 text-right text-slate-700 font-medium">{value.toFixed(1)}</span>
     </div>
   )
 }
@@ -44,8 +44,8 @@ export default function ScoreDisplay({ score }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Rep Score */}
-      <div className="bg-white rounded-lg shadow p-5">
-        <h3 className="text-base font-semibold text-gray-700 mb-4">Rep Score</h3>
+      <div className="bg-white rounded-lg border border-slate-200 p-5">
+        <h3 className="text-base font-semibold text-slate-700 mb-4">Rep Score</h3>
         <div className="flex items-start gap-6">
           <ScoreCircle score={score.rep_score} label="Overall" />
           <div className="flex-1 space-y-2">
@@ -55,13 +55,13 @@ export default function ScoreDisplay({ score }) {
           </div>
         </div>
         {score.rep_reasoning && (
-          <p className="text-sm text-gray-500 mt-4 border-t pt-3">{score.rep_reasoning}</p>
+          <p className="text-sm text-slate-500 mt-4 border-t pt-3">{score.rep_reasoning}</p>
         )}
       </div>
 
       {/* Lead Score */}
-      <div className="bg-white rounded-lg shadow p-5">
-        <h3 className="text-base font-semibold text-gray-700 mb-4">Lead Score</h3>
+      <div className="bg-white rounded-lg border border-slate-200 p-5">
+        <h3 className="text-base font-semibold text-slate-700 mb-4">Lead Score</h3>
         <div className="flex items-start gap-6">
           <ScoreCircle score={score.lead_score} label="Overall" />
           <div className="flex-1 space-y-2">
@@ -71,7 +71,7 @@ export default function ScoreDisplay({ score }) {
           </div>
         </div>
         {score.lead_reasoning && (
-          <p className="text-sm text-gray-500 mt-4 border-t pt-3">{score.lead_reasoning}</p>
+          <p className="text-sm text-slate-500 mt-4 border-t pt-3">{score.lead_reasoning}</p>
         )}
       </div>
     </div>

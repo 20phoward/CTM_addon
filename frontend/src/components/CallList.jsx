@@ -17,7 +17,7 @@ function StatusBadge({ status }) {
 }
 
 function ScoreBadge({ score }) {
-  if (score == null) return <span className="text-gray-400">-</span>
+  if (score == null) return <span className="text-slate-400">-</span>
   const color =
     score >= 8 ? 'text-green-600' :
     score >= 6 ? 'text-yellow-600' :
@@ -79,25 +79,25 @@ export default function CallList() {
   })
 
   const SortHeader = ({ field, children }) => (
-    <th className="px-4 py-2 cursor-pointer select-none hover:text-indigo-600" onClick={() => handleSort(field)}>
+    <th className="px-4 py-2 cursor-pointer select-none hover:text-slate-800" onClick={() => handleSort(field)}>
       {children} {sortField === field ? (sortDir === 'asc' ? '▲' : '▼') : ''}
     </th>
   )
 
-  if (loading) return <p className="text-gray-500">Loading...</p>
+  if (loading) return <p className="text-slate-500">Loading...</p>
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">All Calls</h1>
-        <Link to="/upload" className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+        <Link to="/upload" className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-800">
           Upload New
         </Link>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4">
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="border rounded px-2 py-1 text-sm">
+          className="border border-slate-300 rounded px-2 py-1 text-sm">
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
           <option value="processing">Processing</option>
@@ -105,18 +105,18 @@ export default function CallList() {
           <option value="failed">Failed</option>
         </select>
         <select value={campaignFilter} onChange={e => setCampaignFilter(e.target.value)}
-          className="border rounded px-2 py-1 text-sm">
+          className="border border-slate-300 rounded px-2 py-1 text-sm">
           <option value="">All Campaigns</option>
           {campaigns.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
 
       {sorted.length === 0 ? (
-        <p className="text-gray-500">No calls found.</p>
+        <p className="text-slate-500">No calls found.</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left">
+            <thead className="bg-slate-50 text-left text-slate-500">
               <tr>
                 <SortHeader field="call_date">Date</SortHeader>
                 <th className="px-4 py-2">Caller</th>
@@ -131,18 +131,18 @@ export default function CallList() {
             </thead>
             <tbody>
               {sorted.map(c => (
-                <tr key={c.id} className="border-t hover:bg-gray-50">
+                <tr key={c.id} className="border-t border-slate-100 hover:bg-slate-50">
                   <td className="px-4 py-2">
-                    <Link to={`/calls/${c.id}`} className="text-indigo-600 hover:underline">
+                    <Link to={`/calls/${c.id}`} className="text-slate-600 hover:text-slate-800 hover:underline">
                       {c.call_date ? new Date(c.call_date).toLocaleDateString() : '-'}
                     </Link>
                   </td>
-                  <td className="px-4 py-2 text-gray-600">{c.caller_phone || '-'}</td>
+                  <td className="px-4 py-2 text-slate-500">{c.caller_phone || '-'}</td>
                   <td className="px-4 py-2">{c.campaign_name || '-'}</td>
                   <td className="px-4 py-2">{formatDuration(c.duration)}</td>
                   <td className="px-4 py-2"><ScoreBadge score={c.rep_score} /></td>
                   <td className="px-4 py-2"><ScoreBadge score={c.lead_score} /></td>
-                  <td className="px-4 py-2 text-gray-600">{c.rep_name || '-'}</td>
+                  <td className="px-4 py-2 text-slate-500">{c.rep_name || '-'}</td>
                   <td className="px-4 py-2"><StatusBadge status={c.status} /></td>
                   <td className="px-4 py-2">
                     <button onClick={() => handleDelete(c.id)} className="text-red-500 hover:text-red-700 text-xs">
