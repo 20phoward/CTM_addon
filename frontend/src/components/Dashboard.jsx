@@ -35,11 +35,11 @@ function StatusBadge({ status }) {
   )
 }
 
-function NavWidget({ to, title, description, accent }) {
+function NavWidget({ to, title, description }) {
   return (
-    <Link to={to} className="bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition p-6 flex flex-col gap-2">
-      <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
-      <p className="text-sm text-slate-500">{description}</p>
+    <Link to={to} className="bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition p-4 flex flex-col gap-1">
+      <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+      <p className="text-xs text-slate-400">{description}</p>
     </Link>
   )
 }
@@ -63,24 +63,44 @@ export default function Dashboard() {
         <p className="text-sm text-slate-500 mt-1">Here's an overview of your call scoring activity.</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Total Calls" value={stats.total_calls} />
-        <StatCard label="Completed" value={stats.completed_calls} />
-        <StatCard label="Avg Rep Score" value={stats.avg_rep_score != null ? stats.avg_rep_score.toFixed(1) : 'N/A'} color="text-slate-700" />
-        <StatCard label="Avg Lead Score" value={stats.avg_lead_score != null ? stats.avg_lead_score.toFixed(1) : 'N/A'} color="text-emerald-600" />
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Stats summary — left side */}
+        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-lg p-6">
+          <h2 className="text-sm font-medium text-slate-400 mb-4">Overview</h2>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <p className="text-3xl font-bold text-slate-900">{stats.total_calls}</p>
+              <p className="text-sm text-slate-500 mt-1">Total Calls</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-slate-900">{stats.completed_calls}</p>
+              <p className="text-sm text-slate-500 mt-1">Completed</p>
+            </div>
+            <div>
+              <p className={`text-3xl font-bold ${stats.avg_rep_score != null ? 'text-slate-700' : 'text-slate-300'}`}>
+                {stats.avg_rep_score != null ? stats.avg_rep_score.toFixed(1) : '—'}
+              </p>
+              <p className="text-sm text-slate-500 mt-1">Avg Rep Score</p>
+            </div>
+            <div>
+              <p className={`text-3xl font-bold ${stats.avg_lead_score != null ? 'text-emerald-600' : 'text-slate-300'}`}>
+                {stats.avg_lead_score != null ? stats.avg_lead_score.toFixed(1) : '—'}
+              </p>
+              <p className="text-sm text-slate-500 mt-1">Avg Lead Score</p>
+            </div>
+          </div>
+        </div>
 
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-3">Quick Access</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <NavWidget to="/calls" title="Calls" description="Browse and review all scored calls" accent="#6366f1" />
-          <NavWidget to="/upload" title="Upload" description="Upload audio files for transcription and scoring" accent="#8b5cf6" />
-          <NavWidget to="/reports" title="Reports" description="View trends, campaign metrics, and export data" accent="#10b981" />
+        {/* Quick access — right side */}
+        <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <NavWidget to="/calls" title="Calls" description="Browse scored calls" />
+          <NavWidget to="/upload" title="Upload" description="Upload audio files" />
+          <NavWidget to="/reports" title="Reports" description="Trends & exports" />
           {user.role === 'admin' && (
             <>
-              <NavWidget to="/users" title="Users" description="Manage user accounts and role assignments" accent="#f59e0b" />
-              <NavWidget to="/teams" title="Teams" description="Create and manage teams" accent="#f97316" />
-              <NavWidget to="/audit-log" title="Audit Log" description="Review system activity and access history" accent="#ef4444" />
+              <NavWidget to="/users" title="Users" description="Manage accounts" />
+              <NavWidget to="/teams" title="Teams" description="Manage teams" />
+              <NavWidget to="/audit-log" title="Audit Log" description="Activity history" />
             </>
           )}
         </div>
