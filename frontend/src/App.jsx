@@ -33,7 +33,7 @@ function Navbar() {
     <nav className="bg-slate-800 text-white">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-8">
-          <Link to="/" className="text-xl font-bold tracking-tight">CTM Scorer</Link>
+          <Link to="/" className="text-xl font-bold font-mono tracking-wider">CTM Scorer</Link>
           <div className="flex gap-6 text-sm font-medium">
             <Link to="/" className="hover:text-slate-300">Dashboard</Link>
             <Link to="/calls" className="hover:text-slate-300">Calls</Link>
