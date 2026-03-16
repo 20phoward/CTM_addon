@@ -107,7 +107,7 @@ def score_call(transcript_text: str, segments: list[dict], call_metadata: dict) 
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=1024,
+        max_tokens=2048,
         temperature=0,
         messages=[{"role": "user", "content": prompt}],
     )
